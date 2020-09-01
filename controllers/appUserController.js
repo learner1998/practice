@@ -1,13 +1,11 @@
-const Appuser = require('../Models/appuser')
+const AppUser = require('../Models/appuser')
 
 
 
-exports.getAppusers = async (req, res) => {
-    console.log('Hello');
-
+exports.getAppUsers = async (req, res) => {
     try {
-        const appusers = await Appuser.find({})
-        res.status(200).send(appusers)
+        const appUsers = await AppUser.find({})
+        res.status(200).send(appUsers)
     } catch (e) {
         res.status(500).send()
     }
@@ -15,65 +13,97 @@ exports.getAppusers = async (req, res) => {
 }
 
 
-exports.getAppuser = async (req, res) => {
+exports.getAppUser = async (req, res) => {
     try {
-        const appuser = await Appuser.findById({_id: req.params.id})
-        if(!appuser){
+        const appUser = await AppUser.findById({
+            _id: req.params.id
+        })
+        if (!appUser) {
             return res.status(404).json({
-                message:'Not Found!'
+                message: 'Not Found!'
             })
         }
         res.status(200).json({
-            message:'Found!',
-            data:appuser
+            message: 'Found!',
+            data: appUser
         })
     } catch (e) {
         res.status(500).json({
-            message:'Internal Server Error!'
+            message: 'Internal Server Error!'
         })
     }
 }
 
 
-exports.createAppuser = async (req, res) => {
-    const employee = new Appuser(req.body);
+
+exports.createAppUser = async (req, res) => {
+    const appUser = new AppUser(req.body);
     try {
-        await employee.save()
+        await appUser.save()
         res.status(201).json({
             message: "Created!",
-            data: employee
+            data: appUser
         })
     } catch (e) {
         res.status(500).send(e);
     }
 }
 
-
-
-
-exports.updateAppuser = async(req, res) => {
+exports.login = async (req, res) => {
     try {
-        const appuser = await Appuser.findByIdAndUpdate(req.params.id,req.body,{
-            runValidators:true,
-            new:true
+    const appUser = await AppUser.findByCredentials(req.body.email,req.body.password)
+        res.status(200).json({
+            message: "logged in!",
+            data: appUser
         })
-        console.log(appuser);
-       if (!appuser) {
-           return res.status(404).json({ message: 'Not Found!'})
-       }
-       res.status(200).json({
-        message: "Updated!",
-        data: appuser
-    })
+    } catch (e) {
+        res.status(404).json({
+            message: 'Unable to Login!'
+        })
+    }
+}
 
-   } catch(e){
-       res.status(500).json({ message: "Internal Server Error" })
-   }
+
+
+exports.updateAppUser = async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['organisationName', 'website', 'contact', 'email', 'password']
+    isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).json({
+            message: "invalid Update!"
+        })
+    }
+
+    try {
+        const appUser = await AppUser.findById(req.params.id)
+        if (!appUser) {
+            return res.status(404).json({
+                message: 'Not Found!'
+            })
+        }
+        updates.forEach((update) => appUser[update] = req.body[update])
+        await appUser.save()
+
+        res.json({
+            message: "Updated!",
+            data: appUser
+        })
+
+    } catch (e) {
+        res.status(500).json({
+            message: "Internal Server Error" 
+            + e
+        })
+    }
 }
 
 exports.deleteAppuser = async (req, res) => {
     try {
-         const appuser = await Appuser.findByIdAndDelete({_id: req.params.id})
+        const appuser = await AppUser.findByIdAndDelete({
+            _id: req.params.id
+        })
         if (!appuser) {
             return res.status(404).json({
                 message: 'Not Found!'
@@ -83,7 +113,7 @@ exports.deleteAppuser = async (req, res) => {
             message: "Deleted!",
             data: appuser
         })
-    } catch(e){
+    } catch (e) {
         res.status(500).json({
             message: "Internal Server Error",
         })

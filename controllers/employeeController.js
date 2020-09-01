@@ -50,8 +50,6 @@ exports.createEmployee= async (req, res) => {
 }
 
 
-
-
 exports.updateEmployee = async(req, res) => {
     try {
         const employee = await Employee.findByIdAndUpdate(req.params.id,req.body,{

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 var validator = require('validator');
+const bcrypt = require('bcryptjs')
+
 const appUserSchema = new mongoose.Schema({
-    // AppUserId: mongoose.Types.ObjectId(),
     organisationName:{
         type:String,
         required:[true,'please specify an organisation name'],
@@ -27,10 +28,14 @@ const appUserSchema = new mongoose.Schema({
 
    email:{
        type:String,
+       unique:true,
         validate:{
         validator: validator.isEmail,
         message: 'invalid email',
       }
+   },
+   password:{
+    type:String
    },
 
     createdAt:{
@@ -38,11 +43,35 @@ const appUserSchema = new mongoose.Schema({
         default: Date.now
     }
 
-
   });
 
 
-  module.exports = mongoose.model('AppUser',appUserSchema)
+  appUserSchema.statics.findByCredentials = async (email, password) => {
+    const user = await AppUser.findOne({ email })
+
+    if (!user) {
+        throw new Error('Unable to login')
+    }
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+        throw new Error('Unable to login')
+    }
+    return user
+}
+
+
+  //hashing password before saving and updating!
+  appUserSchema.pre('save', async function(next){
+    const appUser = this
+    if(appUser.isModified('password')){
+        appUser.password = await bcrypt.hash(appUser.password,8)
+    }
+    next()
+  })
+  const AppUser = mongoose.model('AppUser', appUserSchema)
+  module.exports = AppUser
+
 
 
 
