@@ -40,9 +40,10 @@ exports.createAppUser = async (req, res) => {
     const appUser = new AppUser(req.body);
     try {
         await appUser.save()
+        const token = await appUser.generateAuthToken()
         res.status(201).json({
             message: "Created!",
-            data: appUser
+            data: {appUser,token}
         })
     } catch (e) {
         res.status(500).send(e);
@@ -52,9 +53,10 @@ exports.createAppUser = async (req, res) => {
 exports.login = async (req, res) => {
     try {
     const appUser = await AppUser.findByCredentials(req.body.email,req.body.password)
+    const token = await appUser.generateAuthToken()
         res.status(200).json({
             message: "logged in!",
-            data: appUser
+            data: {appUser,token}
         })
     } catch (e) {
         res.status(404).json({
