@@ -53,7 +53,7 @@ const appUserSchema = new mongoose.Schema({
     }
 
   });
-//method to genrate token
+//method to generate token
 appUserSchema.methods.generateAuthToken = async function(){
     const user = this
     const token = await jwt.sign({_id: user._id.toString()}, 'newappuser')

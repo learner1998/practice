@@ -1,16 +1,19 @@
 const AppUser = require('../Models/appuser')
+const auth = require('../middleware/auth')
 
 
 
-exports.getAppUsers = async (req, res) => {
-    try {
-        const appUsers = await AppUser.find({})
-        res.status(200).send(appUsers)
-    } catch (e) {
-        res.status(500).send()
-    }
-
+exports.getAppUsers = auth ,async(req, res) => {
+    const appUser = req.appUser
+    res.send(appUser)
+    // try {
+    //     const appUsers = await AppUser.find({})
+    //     res.status(200).send(appUsers)
+    // } catch (e) {
+    //     res.status(500).send()
+    // }
 }
+
 
 
 exports.getAppUser = async (req, res) => {
@@ -33,7 +36,6 @@ exports.getAppUser = async (req, res) => {
         })
     }
 }
-
 
 
 exports.createAppUser = async (req, res) => {
