@@ -4,8 +4,13 @@ const auth = require('../middleware/auth')
 const { login , deleteAppuser, getAppUser, updateAppUser, getAppUsers, createAppUser} = require('../controllers/appUserController');
 router
 .route('/')
-.get(getAppUsers)
 .post(createAppUser)
+
+router
+.route('/me')
+.get(auth,getAppUsers)
+
+
 
 router
 .route('/login')

@@ -3,15 +3,9 @@ const auth = require('../middleware/auth')
 
 
 
-exports.getAppUsers = auth ,async(req, res) => {
-    const appUser = req.appUser
+exports.getAppUsers = async(req, res) => {
+    const appUser = await req.appUser
     res.send(appUser)
-    // try {
-    //     const appUsers = await AppUser.find({})
-    //     res.status(200).send(appUsers)
-    // } catch (e) {
-    //     res.status(500).send()
-    // }
 }
 
 

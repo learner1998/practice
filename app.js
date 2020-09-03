@@ -3,9 +3,7 @@ const app = express();
 const appUserRoute = require('./routes/appuserRoute')
 const employeeRoute = require('./routes/employeeRoute')
 const morgan = require('morgan')
-const auth = require('./middleware/auth')
 const colors = require('colors');
-const AppUser = require('./Models/appuser');
 require('./db/mongoose')
 app.use(express.json())
 const PORT = process.env.PORT  || 3000
